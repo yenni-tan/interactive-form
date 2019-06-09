@@ -8,8 +8,8 @@ $('#name').focus();
  */
 $('#other-title').hide();
 const $title = $('#title');
-$title.on('change', function($event) {
-    if ($event.target.value === 'other') {
+$title.on('change', function() {
+    if ($(this).val() === 'other') {
         $('#other-title').show();
     } else {
         $('#other-title').hide();
@@ -19,18 +19,21 @@ $title.on('change', function($event) {
 // T-Shirt Info
 const $design = $('#design');
 const $color = $('#color');
+$('#colors-js-puns').hide();
 
 /**
- * Only show available colors for theme selected.
+ * Only show available colors for theme selected. 
+ * Don't show colors if no theme selected.
  */
 const designToColors = {};
 designToColors['js puns'] = ['cornflowerblue', 'darkslategrey', 'gold'];
 designToColors['heart js'] = ['tomato', 'steelblue', 'dimgrey'];
 
-$design.on('change', function($event) {
-    $.each($('#color option'), function(index, color) {
-        const colors = designToColors[$event.target.value];
-        if (colors) {
+$design.on('change', function() {    
+    const colors = designToColors[$(this).val()];
+    if (colors) {
+        $('#colors-js-puns').show();
+        $.each($('#color option'), function(index, color) {
             if (colors.includes(color.value)) {
                 $(this).show();
                 if (colors[0] === color.value) {
@@ -38,12 +41,11 @@ $design.on('change', function($event) {
                 }
             } else {
                 $(this).hide();
-            }   
-        } else {
-            $(this).show();
-        }
-        
-    });
+            }
+        });
+    } else {
+        $('#colors-js-puns').hide();
+    }
 });
 
 // Register for Activities
@@ -192,13 +194,15 @@ $('#name').blur(function() {
 });
 
 /**
- * Validate email must be valid.
+ * Validate email is a property formatted email address.
+ * 
+ * Real-time validation as user starts typing.
  */
 const emailError = $('<span id="email-error" class="error">Email field must be a validly formatted e-mail address.</span>').hide();
 $('#mail').after(emailError);
 
 const emailRegex = /[^@]+@[^@]+\..+/;
-$('#mail').blur(function() {
+$('#mail').keyup(function() {
     if (!emailRegex.test($('#mail').val())) {
         $('#email-error').show();
         $('#mail').addClass('error-border');
@@ -245,24 +249,36 @@ $('.activities label input').change(function() {
 /**
  * Verify Credit Card Payment Info.
  */
-const creditCardNumberError = $('<span id="credit-card-number-error" class="error">Invalid credit card number - must be between 13 and 16 digits.</span>').hide();
+const creditCardNumberLengthError = $('<span id="credit-card-number-length-error" class="error">Invalid credit card number - must be between 13 and 16 digits.</span>').hide();
+const creditCardNumberBlankError = $('<span id="credit-card-number-blank-error" class="error">Please enter a credit card number.</span>').hide();
 const creditCardZipError = $('<span id="credit-card-zip-error" class="error">Invalid zip code - must be 5 digits.</span>').hide();
 const creditCardCvvError = $('<span id="credit-card-cvv-error" class="error">Invalid CVV - must be 3 digits.</span>').hide();
-$('#cc-num').after(creditCardNumberError);
+
+$('#cc-num').after(creditCardNumberLengthError);
+$('#cc-num').after(creditCardNumberBlankError);
 $('#zip').after(creditCardZipError);
 $('#cvv').after(creditCardCvvError);
 
 const creditCardNumRegex = /^\d{13,16}$/;
 const creditCardZipRegex = /^\d{5}$/;
 const creditCardCvvRegex = /^\d{3}$/;
+
 $('#cc-num').blur(function() {
-    if (!creditCardNumRegex.test($(this).val())) {
-        $('#credit-card-number-error').show();
+    if ($(this).val().length === 0) {
+        $('#credit-card-number-length-error').hide();
+        $('#credit-card-number-blank-error').show();
+        $('#cc-num').addClass('error-border');
+        isCreditCardNumberValid = false;
+        validateForm();
+    } else if (!creditCardNumRegex.test($(this).val())) {
+        $('#credit-card-number-blank-error').hide();
+        $('#credit-card-number-length-error').show();
         $('#cc-num').addClass('error-border');
         isCreditCardNumberValid = false;
         validateForm();
     } else {
-        $('#credit-card-number-error').hide();
+        $('#credit-card-number-length-error').hide();
+        $('#credit-card-number-blank-error').hide();
         $('#cc-num').removeClass('error-border');
         isCreditCardNumberValid = true;
         validateForm();
