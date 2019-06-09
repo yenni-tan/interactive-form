@@ -1,8 +1,11 @@
 
-// Name
+// Form focuses on Name input on load
 $('#name').focus();
 
-// Job Role
+// Job Role 
+/**
+ * If 'Other' Job Role selected, show input for user to input job role.
+ */
 $('#other-title').hide();
 const $title = $('#title');
 $title.on('change', function($event) {
@@ -17,6 +20,9 @@ $title.on('change', function($event) {
 const $design = $('#design');
 const $color = $('#color');
 
+/**
+ * Only show available colors for theme selected.
+ */
 const designToColors = {};
 designToColors['js puns'] = ['cornflowerblue', 'darkslategrey', 'gold'];
 designToColors['heart js'] = ['tomato', 'steelblue', 'dimgrey'];
@@ -44,8 +50,10 @@ $design.on('change', function($event) {
 const $activityCheckboxes = $('.activities label input');
 const overlappingActivities = ['js-libs', 'js-frameworks', 'express', 'node'];
 
+/**
+ * Calculate Total cost of activities selected.
+ */
 const costRegex = /\d{3}/;
-
 let runningTotal = 0;
 const totalSpan = $(`<span id="total">Total: \$${runningTotal}</span>`);
 $('.activities').append(totalSpan);
@@ -64,9 +72,11 @@ $activityCheckboxes.change(function() {
         runningTotal -= parseInt($(this).parent().text().match(costRegex));
     }
     $('#total').text( `Total: \$${runningTotal}`);
-
 });
 
+/**
+ * Disable or Enable an overlapping activity.
+ */
 function disableEnableOverlappingActivity(name, isChecked, parent) {
     let overlappingActivity;
     if (['js-frameworks', 'js-libs'].includes(name)) {
@@ -82,20 +92,8 @@ function disableEnableOverlappingActivity(name, isChecked, parent) {
     }    
 }
 
-// Payment Info
-$('#payment').val('credit card');
-$('#payment option[value="select_method"]').prop('disabled', true);
-
-function showCreditCardPaymentInfo() {
-    $('#credit-card').show();
-    $('#paypal').hide();
-    $('#bitcoin').hide();
-}
-
-showCreditCardPaymentInfo();
-
 /**
- * Validation
+ * Validation Toggles
  */
 let isNameValid = false;
 let isEmailValid = false;
@@ -105,6 +103,24 @@ let isCreditCardZipValid = false;
 let isCreditCardCvvValid = false;
 let isCreditCardPaymentSelected = true;
 
+// Payment Info
+$('#payment').val('credit card');
+$('#payment option[value="select_method"]').prop('disabled', true);
+
+/**
+ * Show credit card payment inputs.
+ */
+function showCreditCardPaymentInfo() {
+    $('#credit-card').show();
+    $('#paypal').hide();
+    $('#bitcoin').hide();
+}
+
+showCreditCardPaymentInfo();
+
+/**
+ * Show pertaining information based on selected payment method.
+ */
 $('#payment').change(function() {
     if ($('#payment').val() === 'credit card') {
         showCreditCardPaymentInfo();
@@ -127,38 +143,35 @@ $('#payment').change(function() {
 // Form Validation
 $('#submit-button').addClass('disabled').prop('disabled', true);
 
+/**
+ * Validate all form fields to determine if submit button should be enabled or disabled.
+ */
 function validateForm() {
     if (isCreditCardPaymentSelected) {
-        console.log('cc selected');
         if (isNameValid 
             && isEmailValid
             && isActivitySelected
             && isCreditCardNumberValid
             && isCreditCardZipValid
             && isCreditCardCvvValid) {
-                console.log('cc selected valid form');
             $('#submit-button').removeClass('disabled').prop('disabled', false)
         } else {
-            console.log('cc selected invalid form');
             $('#submit-button').addClass('disabled').prop('disabled', true);
         }
     } else {
-        console.log('cc not selected');
         if (isNameValid 
             && isEmailValid
             && isActivitySelected) {
-                console.log('cc not selected valid');
-
-            $('#submit-button').removeClass('disabled').prop('disabled', false)
+                $('#submit-button').removeClass('disabled').prop('disabled', false)
         } else {
-            console.log('cc not selected invalid');
-
             $('#submit-button').addClass('disabled').prop('disabled', true);
         }
     }
 }
 
- // Name cannot be blank
+/**
+ * Validate name cannot be blank.
+ */
 const nameError = $('<span id="name-error" class="error">Name field can\'t be blank.</span>').hide();
 $('#name').after(nameError);
 
@@ -178,7 +191,9 @@ $('#name').blur(function() {
     }
 });
 
-// Email must be valid
+/**
+ * Validate email must be valid.
+ */
 const emailError = $('<span id="email-error" class="error">Email field must be a validly formatted e-mail address.</span>').hide();
 $('#mail').after(emailError);
 
@@ -197,7 +212,9 @@ $('#mail').blur(function() {
     }
 });
 
-// User must select at least one checkbox under the "Register for Activities" section  
+/**
+ * Validate User must select at least one checkbox under the "Register for Activities" section.
+ */
 const activityError = $('<span id="activity-error" class="error">You must select at least one activity.</span>').hide();
 $('.activities').after(activityError);
 
@@ -225,7 +242,9 @@ $('.activities label input').change(function() {
     }
 });
 
-// Verify Credit Card Payment Info
+/**
+ * Verify Credit Card Payment Info.
+ */
 const creditCardNumberError = $('<span id="credit-card-number-error" class="error">Invalid credit card number - must be between 13 and 16 digits.</span>').hide();
 const creditCardZipError = $('<span id="credit-card-zip-error" class="error">Invalid zip code - must be 5 digits.</span>').hide();
 const creditCardCvvError = $('<span id="credit-card-cvv-error" class="error">Invalid CVV - must be 3 digits.</span>').hide();
@@ -277,5 +296,3 @@ $('#cvv').blur(function() {
         validateForm();
     }
 });
-
-
