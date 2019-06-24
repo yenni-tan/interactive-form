@@ -1,0 +1,16 @@
+.error {
+    color: red;
+}
+
+.error-border {
+    border: solid 1px red;
+}
+
+
+.error-outline {
+    outline: solid 1px red;
+}
+
+.disabled, button:hover {
+    background-color: slategray;
+}
